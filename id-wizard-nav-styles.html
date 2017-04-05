@@ -1,0 +1,155 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+
+<dom-module id="id-wizard-nav-styles">
+  <template>
+    <style>
+
+      @media (min-width: 768px) {
+        .nav-wizard {
+          background-color: #f9f9f9;
+          position: relative;
+          overflow: hidden;
+          display: block !important;
+          border-bottom: 3px solid #c00;
+        }
+
+        .nav-wizard:before {
+          display: block;
+          position: absolute;
+          left: 0px;
+          right: 0px;
+          top: 56px;
+          height: 47px;
+          border-top: 1px solid #d4d4d4;
+          border-bottom: 1px solid #d4d4d4;
+          z-index: 11;
+          content: " ";
+        }
+        .nav-wizard:after {
+          display: block;
+          position: absolute;
+          left: 0px;
+          right: 0px;
+          top: 138px;
+          height: 47px;
+          border-top: 1px solid #d4d4d4;
+          border-bottom: 1px solid #d4d4d4;
+          z-index: 11;
+          content: " ";
+        }
+        .nav-wizard li {
+          position: relative;
+          float: left;
+          height: 56px;
+          display: inline-block;
+          text-align: center;
+          padding: 0 20px 0 40px;
+          margin: 0;
+          line-height: 56px;
+        }
+        .nav-wizard li:first-child {
+          padding-left: 15px;
+        }
+        .nav-wizard li a {
+          color: var(--id-link-color, #0027c1);
+          padding: 0;
+        }
+        .nav-wizard li a:hover {
+          background-color: transparent;
+          color: var(--id-link-hover-color, #001875);
+        }
+        .nav-wizard li:before {
+          position: absolute;
+          display: block;
+          border: 29px solid transparent;
+          border-left: 21px solid #d4d4d4;
+          border-right: 0;
+          top: -1px;
+          z-index: 10;
+          content: '';
+          right: -21px;
+        }
+        .nav-wizard li:after {
+          position: absolute;
+          display: block;
+          border: 29px solid transparent;
+          border-left: 21px solid #f9f9f9;
+          border-right: 0;
+          top: -1px;
+          z-index: 10;
+          content: '';
+          right: -20px;
+        }
+        .nav-wizard li.active {
+          color: #fff;
+          background: #558B2F;
+        }
+        .nav-wizard li.active:after {
+          border-left: 21px solid #558B2F;
+        }
+        .nav-wizard li.active a,
+        .nav-wizard li.active a:active,
+        .nav-wizard li.active a:visited,
+        .nav-wizard li.active a:focus {
+          color: #fff;
+          background: #558B2F;
+        }
+        .nav-wizard .active ~ li {
+          color: #999999;
+          background: #ededed;
+        }
+        .nav-wizard .active ~ li:after {
+          border-left: 21px solid #ededed;
+        }
+        .nav-wizard .active ~ li a,
+        .nav-wizard .active ~ li a:active,
+        .nav-wizard .active ~ li a:visited,
+        .nav-wizard .active ~ li a:focus {
+          color: #999999;
+          background: #ededed;
+          text-decoration: none;
+        }
+        .nav-wizard.nav-wizard-backnav li:hover {
+          color: #468847;
+          background: #f6fbfd;
+        }
+        .nav-wizard.nav-wizard-backnav li:hover:after {
+          border-left: 21px solid #f6fbfd;
+        }
+        .nav-wizard.nav-wizard-backnav li:hover a,
+        .nav-wizard.nav-wizard-backnav li:hover a:active,
+        .nav-wizard.nav-wizard-backnav li:hover a:visited,
+        .nav-wizard.nav-wizard-backnav li:hover a:focus {
+          color: #468847;
+          background: #f6fbfd;
+        }
+        .nav-wizard.nav-wizard-backnav .active ~ li {
+          color: #999999;
+          background: #ededed;
+        }
+        .nav-wizard.nav-wizard-backnav .active ~ li:after {
+          border-left: 21px solid #ededed;
+        }
+        .nav-wizard.nav-wizard-backnav .active ~ li a,
+        .nav-wizard.nav-wizard-backnav .active ~ li a:active,
+        .nav-wizard.nav-wizard-backnav .active ~ li a:visited,
+        .nav-wizard.nav-wizard-backnav .active ~ li a:focus {
+          color: #999999;
+          background: #ededed;
+        }
+      }
+
+    </style>
+  </template>
+</dom-module>

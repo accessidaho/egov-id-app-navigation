@@ -1,0 +1,220 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="id-tabbed-nav-styles.html">
+<link rel="import" href="id-wizard-nav-styles.html">
+
+<!--
+`id-app-navigation`
+Application navigation
+
+@demo demo/index.html
+-->
+
+<dom-module id="id-app-navigation">
+  <template>
+    <style include="id-wizard-nav-styles"></style>
+    <style include="id-tabbed-nav-styles">
+      :host {
+        display: block;
+        margin-left: -15px;
+        margin-right: -15px;
+        position: relative;
+      };
+
+      * {
+        box-sizing: border-box;
+      }
+
+      .nav.visible {
+        opacity: 1;
+        transition: opacity ease-in-out .15s,max-height 0.25s ease-in;
+        -webkit-transition: opacity ease-in-out .15s,max-height 0.25s ease-in;
+        -o-transition: opacity ease-in-out .15s,max-height 0.25s ease-in;
+        max-height: var(--id-mobile-navigation-height, 500px);
+      }
+
+      .nav {
+        border-bottom: 1px solid #ddd;
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+        list-style: none;
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+        -webkit-transition: opacity ease-in-out .15s, max-height 0.15s ease-out;
+        transition: opacity ease-in-out .15s, max-height 0.15s ease-out;
+        -o-transition: opacity ease-in-out .15s, max-height 0.15s ease-out;
+
+      }
+
+      .nav a {
+        display: block;
+        padding: .75em 1em;
+        text-decoration: none;
+        color: var(--id-link-color, #0027c1);
+        text-decoration: none;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .nav a:hover {
+        color: var(--id-link-color-hover, #001875);
+        text-decoration: underline;
+      }
+
+      .nav li.disabled a {
+        color: #999999;
+        background: #ededed;
+        text-decoration: none;
+        cursor: default;
+      }
+
+      .nav li.active a {
+        color: #fff;
+        background-color: var(--id-primary-color, #2968c0);
+      }
+
+      #menu-toggle {
+        display: block;
+        position: absolute;
+        z-index: 6;
+        top: -78px;
+        right: 15px;
+        width: 63px;
+        height: 63px;
+        color: #fff;
+        border: 1px solid;
+        background-color: var(--id-primary-color, #2968c0);
+        border-color: var(--id-primary-border, #255dab);
+      }
+
+      #menu-toggle:before {
+        font: normal normal normal 28px/1 FontAwesome;
+        content: "\f0c9";
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #menu-toggle:hover {
+        color: #fff;
+        background-color: var(--id-primary-color-hover, #205196);
+        border-color: var(--id-primary-border-hover, #1a4179);
+      }
+
+      #menu-toggle:focus {
+        color: #fff;
+        background-image: none;
+        outline: none;
+        -webkit-box-shadow: 0 0 0 2px var(--id-primary-color-hover, rgba(2,117,216,.5));
+        box-shadow: 0 0 0 2px var(--id-primary-color-hover, rgba(2,117,216,.5));
+      }
+
+
+      @media (min-width: 768px) {
+        #menu-toggle {
+          display: none;
+        }
+
+        .nav {
+          opacity: 1;
+          height: auto;
+          max-height: none;
+          overflow: visible;
+        }
+      }
+    </style>
+    <button id="menu-toggle" on-click="_dropDownToggle"></button>
+    <template is="dom-if" if="[[tabbed]]">
+      <div role="navigation" class$="[[_menuClass('nav-tabbed', dropdownVisible)]]">
+        <template is="dom-repeat" items="[[items]]">
+          <li name$="[[item.id]]" class$="[[_itemClass(index, current)]]">
+            <a id$="[[item.id]]" href="[[item.url]]" on-click="_activate">[[item.title]]</a>
+          </li>
+        </template>
+      </div>
+    </template>
+    <template is="dom-if" if="[[wizard]]">
+      <div role="navigation" class$="[[_menuClass('nav-wizard', dropdownVisible)]]">
+        <template is="dom-repeat" items="[[items]]">
+          <li name$="[[item.id]]" class$="[[_itemClass(index, current, wizard)]]">
+            <a id$="[[item.id]]" href="[[item.url]]" on-click="_activate">[[item.title]]</a>
+          </li>
+        </template>
+      </div>
+    </template>
+  </template>
+
+  <script>
+    class IdAppNavigation extends Polymer.Element {
+      static get is() { return 'id-app-navigation'; }
+      static get properties() {
+        return {
+          wizard: {
+            type: Boolean,
+            value: false
+          },
+          tabbed: {
+            type: Boolean,
+            value: false
+          },
+          page: {
+            type: String,
+            notify: true,
+            observer: '_pageChanged'
+          },
+          current: Number,
+          items: {
+            type: Array,
+            value: []
+          }
+        };
+      }
+
+      _pageChanged() {
+        let pageIndex = this.items.findIndex(x => x.id === this.page);
+
+        if (pageIndex > this.current) {
+          this.set('current', pageIndex);
+        }
+
+        if (this.tab) {
+          this.set('current', pageIndex);
+        }
+      }
+
+      _itemClass(item, current, wizard) {
+        if (item === current) return 'active';
+        else if (item > current && wizard) return 'disabled';
+        else return '';
+      }
+
+      _menuClass(className, dropdownVisible) {
+        let visible = (dropdownVisible) ? ' visible' : '';
+        return 'nav ' + className + visible;
+      }
+
+      _activate(e) {
+        let item = this.items.findIndex(x => x.id === e.target.id);
+        if (item > this.current && this.wizard) {
+          e.preventDefault();
+        } else {
+          this.set('page', this.items[item].id);
+        }
+
+        if (this.tabbed) {
+          this.set('current', item);
+        }
+      }
+
+      _dropDownToggle() {
+        this.set('dropdownVisible', !this.dropdownVisible);
+      }
+
+      ready() {
+        super.ready();
+        this.current = this.items.findIndex(x => x.id === this.page);
+        this.dropdownVisible = false;
+      }
+    }
+
+    window.customElements.define(IdAppNavigation.is, IdAppNavigation);
+  </script>
+</dom-module>
