@@ -121,24 +121,26 @@ Application navigation
         }
       }
     </style>
-    <button id="menu-toggle" on-click="_dropDownToggle"></button>
-    <template is="dom-if" if="[[tabbed]]">
-      <div role="navigation" class$="[[_menuClass('nav-tabbed', dropdownVisible)]]">
-        <template is="dom-repeat" items="[[items]]">
-          <li name$="[[item.id]]" class$="[[_itemClass(index, current)]]">
-            <a id$="[[item.id]]" href="[[item.url]]" on-click="_activate">[[item.title]]</a>
-          </li>
-        </template>
-      </div>
-    </template>
-    <template is="dom-if" if="[[wizard]]">
-      <div role="navigation" class$="[[_menuClass('nav-wizard', dropdownVisible)]]">
-        <template is="dom-repeat" items="[[items]]">
-          <li name$="[[item.id]]" class$="[[_itemClass(index, current, wizard)]]">
-            <a id$="[[item.id]]" href="[[item.url]]" on-click="_activate">[[item.title]]</a>
-          </li>
-        </template>
-      </div>
+    <template is="dom-if" if="[[_filtered(filter, page)]]">
+      <button id="menu-toggle" on-click="_dropDownToggle"></button>
+      <template is="dom-if" if="[[tabbed]]">
+        <div role="navigation" class$="[[_menuClass('nav-tabbed', dropdownVisible)]]">
+          <template is="dom-repeat" items="[[items]]">
+            <li name$="[[item.id]]" class$="[[_itemClass(index, current)]]">
+              <a id$="[[item.id]]" href="[[item.url]]" on-click="_activate">[[item.title]]</a>
+            </li>
+          </template>
+        </div>
+      </template>
+      <template is="dom-if" if="[[wizard]]">
+        <div role="navigation" class$="[[_menuClass('nav-wizard', dropdownVisible)]]">
+          <template is="dom-repeat" items="[[items]]">
+            <li name$="[[item.id]]" class$="[[_itemClass(index, current, wizard)]]">
+              <a id$="[[item.id]]" href="[[item.url]]" on-click="_activate">[[item.title]]</a>
+            </li>
+          </template>
+        </div>
+      </template>
     </template>
   </template>
 
@@ -147,27 +149,61 @@ Application navigation
       static get is() { return 'id-app-navigation'; }
       static get properties() {
         return {
+          /**
+           * Specifies a wizard layout.
+           */
           wizard: {
             type: Boolean,
             value: false
           },
+          /**
+           * Specifies a tabbed layout.
+           */
           tabbed: {
             type: Boolean,
             value: false
           },
+          /**
+           * Current page
+           */
           page: {
             type: String,
             notify: true,
             observer: '_pageChanged'
           },
+          /**
+           * Current page index.
+           */
           current: Number,
+          /**
+           * Navigation items.
+           */
           items: {
             type: Array,
             value: []
-          }
+          },
+          /**
+           * Doesn't show navigation on these ids.
+           */
+          filter: Array
         };
       }
 
+      /**
+       * Filters navigation out on pages.
+       * @param  {array} filter this.filter
+       * @param  {string} page  this.page
+       * @return boolean
+       */
+      _filtered(filter, page) {
+        if (filter && filter.length) {
+          return (filter.find(x => x === page)) ? false : true;
+        }
+      }
+
+      /**
+       * Observer for this.page change.
+       */
       _pageChanged() {
         let pageIndex = this.items.findIndex(x => x.id === this.page);
 
@@ -180,17 +216,35 @@ Application navigation
         }
       }
 
+      /**
+       * Sets the item class
+       * @param  {object} item    singular from this.items
+       * @param  {integer} current current page index
+       * @param  {boolean} wizard  whether it's a wizard nav.
+       * @return string
+       */
       _itemClass(item, current, wizard) {
         if (item === current) return 'active';
         else if (item > current && wizard) return 'disabled';
         else return '';
       }
 
+      /**
+       * Sets the menu class
+       * @param  {string} className       class to prefix
+       * @param  {boolean} dropdownVisible whether the dropdown is visible
+       * @return string
+       */
       _menuClass(className, dropdownVisible) {
         let visible = (dropdownVisible) ? ' visible' : '';
         return 'nav ' + className + visible;
       }
 
+      /**
+       * Sets the new page as active
+       * @param  {object} e Event
+       * @return null
+       */
       _activate(e) {
         let item = this.items.findIndex(x => x.id === e.target.id);
         if (item > this.current && this.wizard) {
@@ -204,6 +258,9 @@ Application navigation
         }
       }
 
+      /**
+       * Toggles the dropdown as visible.
+       */
       _dropDownToggle() {
         this.set('dropdownVisible', !this.dropdownVisible);
       }
