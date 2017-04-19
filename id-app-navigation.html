@@ -18,7 +18,11 @@ Application navigation
         margin-left: -15px;
         margin-right: -15px;
         position: relative;
-      };
+      }
+
+      :host([hidden]) {
+        display: none;
+      }
 
       * {
         box-sizing: border-box;
@@ -121,26 +125,25 @@ Application navigation
         }
       }
     </style>
-    <template is="dom-if" if="[[_filtered(filter, page)]]">
-      <button id="menu-toggle" on-click="_dropDownToggle"></button>
-      <template is="dom-if" if="[[tabbed]]">
-        <div role="navigation" class$="[[_menuClass('nav-tabbed', dropdownVisible)]]">
-          <template is="dom-repeat" items="[[items]]">
-            <li name$="[[item.id]]" class$="[[_itemClass(index, current)]]">
-              <a id$="[[item.id]]" href="[[item.url]]" on-click="_activate">[[item.title]]</a>
-            </li>
-          </template>
-        </div>
-      </template>
-      <template is="dom-if" if="[[wizard]]">
-        <div role="navigation" class$="[[_menuClass('nav-wizard', dropdownVisible)]]">
-          <template is="dom-repeat" items="[[items]]">
-            <li name$="[[item.id]]" class$="[[_itemClass(index, current, wizard)]]">
-              <a id$="[[item.id]]" href="[[item.url]]" on-click="_activate">[[item.title]]</a>
-            </li>
-          </template>
-        </div>
-      </template>
+
+    <button id="menu-toggle" on-click="_dropDownToggle"></button>
+    <template is="dom-if" if="[[tabbed]]">
+      <div role="navigation" class$="[[_menuClass('nav-tabbed', dropdownVisible)]]">
+        <template is="dom-repeat" items="[[items]]">
+          <li name$="[[item.id]]" class$="[[_itemClass(index, current)]]">
+            <a id$="[[item.id]]" href="[[item.url]]" on-click="_activate">[[item.title]]</a>
+          </li>
+        </template>
+      </div>
+    </template>
+    <template is="dom-if" if="[[wizard]]">
+      <div role="navigation" class$="[[_menuClass('nav-wizard', dropdownVisible)]]">
+        <template is="dom-repeat" items="[[items]]">
+          <li name$="[[item.id]]" class$="[[_itemClass(index, current, wizard)]]">
+            <a id$="[[item.id]]" href="[[item.url]]" on-click="_activate">[[item.title]]</a>
+          </li>
+        </template>
+      </div>
     </template>
   </template>
 
@@ -166,10 +169,10 @@ Application navigation
           /**
            * Current page
            */
-          page: {
-            type: String,
+          route: {
+            type: Object,
             notify: true,
-            observer: '_pageChanged'
+            observer: '_routeChanged'
           },
           /**
            * Current page index.
@@ -185,7 +188,12 @@ Application navigation
           /**
            * Doesn't show navigation on these ids.
            */
-          filter: Array
+          filter: Array,
+          hidden: {
+            type: Boolean,
+            reflectToAttribute: true,
+            computed: '_filtered(filter, route)'
+          }
         };
       }
 
@@ -195,17 +203,19 @@ Application navigation
        * @param  {string} page  this.page
        * @return boolean
        */
-      _filtered(filter, page) {
+      _filtered(filter, route) {
         if (filter && filter.length) {
-          return (filter.find(x => x === page)) ? false : true;
+          return (filter.find(x => x === '#' + route.path)) ? true : false;
+        } else {
+          return false;
         }
       }
 
       /**
        * Observer for this.page change.
        */
-      _pageChanged() {
-        let pageIndex = this.items.findIndex(x => x.id === this.page);
+      _routeChanged() {
+        let pageIndex = this.items.findIndex(x => x.url === '#' + this.route.path);
 
         if (pageIndex > this.current) {
           this.set('current', pageIndex);
