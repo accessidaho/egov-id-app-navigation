@@ -129,9 +129,9 @@ Application navigation
     <button id="menu-toggle" on-click="_dropDownToggle"></button>
     <template is="dom-if" if="[[tabbed]]">
       <div role="navigation" class$="[[_menuClass('nav-tabbed', dropdownVisible)]]">
-        <template is="dom-repeat" items="[[items]]">
-          <li name$="[[item.id]]" class$="[[_itemClass(index, current)]]">
-            <a id$="[[item.id]]" href="[[item.url]]" on-click="_activate">[[item.title]]</a>
+        <template is="dom-repeat" items="{{items}}">
+          <li name$="[[item.id]]" class$="[[_itemClass(item, route.path)]]">
+            <a id$="[[item.id]]" href="#[[item.path]]" on-click="_activate">[[item.title]]</a>
           </li>
         </template>
       </div>
@@ -139,8 +139,8 @@ Application navigation
     <template is="dom-if" if="[[wizard]]">
       <div role="navigation" class$="[[_menuClass('nav-wizard', dropdownVisible)]]">
         <template is="dom-repeat" items="[[items]]">
-          <li name$="[[item.id]]" class$="[[_itemClass(index, current, wizard)]]">
-            <a id$="[[item.id]]" href="[[item.url]]" on-click="_activate">[[item.title]]</a>
+          <li name$="[[item.id]]" class$="[[_wizardClass(index, current)]]">
+            <a id$="[[item.id]]" href="#[[item.path]]" on-click="_activate">[[item.title]]</a>
           </li>
         </template>
       </div>
@@ -192,7 +192,7 @@ Application navigation
           hidden: {
             type: Boolean,
             reflectToAttribute: true,
-            computed: '_filtered(filter, route)'
+            computed: '_filtered(filter, route.path)'
           }
         };
       }
@@ -205,7 +205,10 @@ Application navigation
        */
       _filtered(filter, route) {
         if (filter && filter.length) {
-          return (filter.find(x => x === '#' + route.path)) ? true : false;
+          return (filter.find(x => {
+            let re = new RegExp(x);
+            return re.test(route);
+          })) ? true : false;
         } else {
           return false;
         }
@@ -215,7 +218,7 @@ Application navigation
        * Observer for this.page change.
        */
       _routeChanged() {
-        let pageIndex = this.items.findIndex(x => x.url === '#' + this.route.path);
+        let pageIndex = this.items.findIndex(x => x.path === '#' + this.route.path);
 
         if (pageIndex > this.current) {
           this.set('current', pageIndex);
@@ -233,9 +236,19 @@ Application navigation
        * @param  {boolean} wizard  whether it's a wizard nav.
        * @return string
        */
-      _itemClass(item, current, wizard) {
-        if (item === current) return 'active';
-        else if (item > current && wizard) return 'disabled';
+      _itemClass(item, route) {
+        if (item.path === route) return 'active';
+        if (item.children) {
+          if (item.children.find(x => x.path === route)) {
+            return 'active';
+          }
+        }
+        return '';
+      }
+
+      _wizardClass(item, current) {
+        if (index === current) return 'active';
+        else if (index > current && wizard) return 'disabled';
         else return '';
       }
 
