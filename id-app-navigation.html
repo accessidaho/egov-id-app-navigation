@@ -167,7 +167,7 @@ Application navigation
             value: false
           },
           /**
-           * Current page
+           * Current route
            */
           route: {
             type: Object,
@@ -186,9 +186,12 @@ Application navigation
             value: []
           },
           /**
-           * Doesn't show navigation on these ids.
+           * Doesn't show navigation on these pages.
            */
           filter: Array,
+          /**
+           * Hides the host element.
+           */
           hidden: {
             type: Boolean,
             reflectToAttribute: true,
@@ -237,6 +240,7 @@ Application navigation
        * @return string
        */
       _itemClass(item, route) {
+        if (!item || !route) return '';
         if (item.path === route) return 'active';
         if (item.children) {
           if (item.children.find(x => x.path === route)) {
@@ -290,7 +294,11 @@ Application navigation
 
       ready() {
         super.ready();
-        this.current = this.items.findIndex(x => x.id === this.page);
+
+        if (this.items) {
+          this.current = this.items.findIndex(x => x.id === this.page);
+        }
+        
         this.dropdownVisible = false;
       }
     }

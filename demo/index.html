@@ -10,18 +10,77 @@
 
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
-    <link rel="import" href="../ip-app-navigation.html">
+    <link rel="import" href="../../polymer/lib/elements/dom-bind.html">
+    <link rel="import" href="../id-app-navigation.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
-    </style>
+        @-ms-viewport {
+          width: device-width;
+        }
+
+        html {
+          -webkit-box-sizing: border-box;
+                  box-sizing: border-box;
+          -ms-overflow-style: scrollbar;
+        }
+
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+          font-size: 0.9rem;
+          font-weight: normal;
+          line-height: 1.5;
+          color: #292b2c;
+          margin: 0;
+          padding: 15px;
+        }
+      </style>
   </head>
   <body>
     <div class="vertical-section-container centered">
-      <h3>Basic ip-app-navigation demo</h3>
+      <h3>Basic id-app-navigation demo</h3>
       <demo-snippet>
         <template>
-          <ip-app-navigation></ip-app-navigation>
+          <dom-bind>
+             <template>
+               <id-app-navigation route="{{route}}" items="{{nav_items}}" tabbed></id-app-navigation>
+             </template>
+          </dom-bind>
         </template>
+
+        <script>
+
+          let demo = document.querySelector('dom-bind');
+
+          demo.route = {
+            path: '/create-payment'
+          }
+
+          demo.nav_items = [
+            { id: 'create-payment',
+              title: 'Create Payment',
+              path: '/create-payment',
+              children: [
+                { id: 'review-payment',
+                  title: 'Review Payment',
+                  path: '/review-payment'
+                },
+                { id: 'confirm-payment',
+                  title: 'Confirm Payment',
+                  path: '/confirmed-payment'
+                }
+              ]
+            },
+            { id: 'clerk-reports',
+              title: 'Clerk Reports',
+              path: '/clerk-reports',
+              protected: true
+            },
+            { id: 'admin',
+              title: 'Admin',
+              path: '/admin'
+            },
+          ]
+        </script>
       </demo-snippet>
     </div>
   </body>
